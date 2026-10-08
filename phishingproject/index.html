@@ -1,0 +1,1387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PhishShield - Detect. Verify. Stay Safe.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  :root {
+    --primary: #0a2540;
+    --primary-dark: #061a2e;
+    --accent: #2563eb;
+    --accent-light: #dbeafe;
+    --accent-hover: #1d4ed8;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --text-light: #94a3b8;
+    --success: #16a34a;
+    --success-light: #dcfce7;
+    --warning: #d97706;
+    --warning-light: #fef3c7;
+    --danger: #dc2626;
+    --danger-light: #fee2e2;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.06), 0 4px 10px rgba(0, 0, 0, 0.04);
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* Header */
+  header {
+    background: var(--card);
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    background: rgba(255, 255, 255, 0.95);
+  }
+
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--primary);
+  }
+
+  .logo-icon {
+    font-size: 26px;
+    line-height: 1;
+  }
+
+  .logo-text {
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+  }
+
+  .logo-tagline {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    margin-top: 2px;
+  }
+
+  .logo-group {
+    display: flex;
+    flex-direction: column;
+  }
+
+  nav ul {
+    display: flex;
+    gap: 8px;
+    list-style: none;
+  }
+
+  nav a {
+    text-decoration: none;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 6px;
+    transition: all 0.15s ease;
+  }
+
+  nav a:hover {
+    color: var(--primary);
+    background: var(--accent-light);
+  }
+
+  .mobile-menu-btn {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  /* Hero */
+  .hero {
+    padding: 56px 0 40px;
+    text-align: center;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-light);
+    color: var(--accent);
+    padding: 6px 16px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 24px;
+  }
+
+  .hero h1 {
+    font-size: 40px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+  }
+
+  .hero-sub {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 560px;
+    margin: 0 auto 28px;
+    line-height: 1.5;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 28px;
+    font-size: 15px;
+    font-weight: 600;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    font-family: inherit;
+  }
+
+  .btn-primary {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+  }
+
+  .btn-secondary {
+    background: #fff;
+    color: var(--primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: var(--bg);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* Main Detection Section */
+  .section {
+    padding: 40px 0 56px;
+  }
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 32px;
+  }
+
+  .section-header h2 {
+    font-size: 28px;
+    font-weight: 800;
+    color: var(--primary);
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+
+  .section-header p {
+    color: var(--text-muted);
+    font-size: 15px;
+  }
+
+  .detection-card {
+    background: var(--card);
+    border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .tabs {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    border-bottom: 1px solid var(--border);
+    background: #fafbfc;
+  }
+
+  .tab-btn {
+    padding: 18px 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 2px solid transparent;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .tab-btn:hover {
+    color: var(--primary);
+    background: #fff;
+  }
+
+  .tab-btn.active {
+    color: var(--primary);
+    background: #fff;
+    border-bottom-color: var(--accent);
+  }
+
+  .tab-content {
+    padding: 32px;
+  }
+
+  .tab-panel {
+    display: none;
+  }
+
+  .tab-panel.active {
+    display: block;
+  }
+
+  .privacy-note {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    padding: 8px 12px;
+    background: #f8fafc;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    width: fit-content;
+  }
+
+  .form-group {
+    margin-bottom: 20px;
+  }
+
+  .form-group:last-of-type {
+    margin-bottom: 24px;
+  }
+
+  .form-label {
+    display: block;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  .form-input,
+  .form-textarea {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 14px;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    color: var(--text);
+    transition: all 0.15s ease;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .form-textarea {
+    resize: vertical;
+    min-height: 140px;
+    line-height: 1.5;
+  }
+
+  .form-input::placeholder,
+  .form-textarea::placeholder {
+    color: var(--text-light);
+  }
+
+  .actions-row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .validation-msg {
+    display: none;
+    background: var(--danger-light);
+    color: var(--danger);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-bottom: 16px;
+    border: 1px solid rgba(220, 38, 38, 0.2);
+  }
+
+  .validation-msg.show {
+    display: block;
+  }
+
+  /* Results */
+  .result-card {
+    display: none;
+    margin-top: 28px;
+    padding: 28px;
+    background: linear-gradient(180deg, #fff 0%, #fafbfc 100%);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+
+  .result-card.show {
+    display: block;
+  }
+
+  .result-label {
+    text-align: center;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 16px;
+  }
+
+  .score-display {
+    text-align: center;
+    margin-bottom: 16px;
+  }
+
+  .score-number {
+    font-size: 56px;
+    font-weight: 800;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .score-number.low { color: var(--success); }
+  .score-number.medium { color: var(--warning); }
+  .score-number.high { color: var(--danger); }
+
+  .score-divider {
+    color: var(--text-light);
+    font-size: 40px;
+    font-weight: 400;
+  }
+
+  .risk-badge {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .risk-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 20px;
+    border-radius: 999px;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .risk-pill.low {
+    background: var(--success-light);
+    color: var(--success);
+  }
+
+  .risk-pill.medium {
+    background: var(--warning-light);
+    color: var(--warning);
+  }
+
+  .risk-pill.high {
+    background: var(--danger-light);
+    color: var(--danger);
+  }
+
+  .result-section-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 12px;
+  }
+
+  .indicators-list {
+    list-style: none;
+    margin-bottom: 24px;
+  }
+
+  .indicators-list li {
+    padding: 8px 12px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    margin-bottom: 6px;
+    font-size: 14px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    color: var(--text);
+  }
+
+  .indicators-list li .indicator-icon {
+    color: var(--danger);
+    font-weight: 700;
+    font-size: 13px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  .indicators-list li.weak .indicator-icon {
+    color: var(--warning);
+  }
+
+  .no-indicators {
+    padding: 12px;
+    background: var(--success-light);
+    color: var(--success);
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 24px;
+    border: 1px solid rgba(22, 163, 74, 0.2);
+  }
+
+  .recommendations {
+    background: var(--accent-light);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    border-radius: 8px;
+    padding: 16px 20px;
+  }
+
+  .recommendations-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+
+  .recommendations ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  .recommendations li {
+    font-size: 13px;
+    color: var(--primary-dark);
+    padding: 4px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .recommendations li::before {
+    content: '•';
+    font-weight: 800;
+    color: var(--accent);
+    flex-shrink: 0;
+  }
+
+  .disclaimer {
+    margin-top: 20px;
+    padding: 14px 16px;
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    border-radius: 8px;
+    font-size: 12px;
+    color: #92400e;
+    line-height: 1.5;
+  }
+
+  .disclaimer strong {
+    color: #78350f;
+  }
+
+  .clear-btn {
+    display: block;
+    margin: 20px auto 0;
+    background: none;
+    border: 1px solid var(--border);
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: inherit;
+    transition: all 0.15s ease;
+  }
+
+  .clear-btn:hover {
+    background: var(--bg);
+    color: var(--danger);
+    border-color: var(--danger);
+  }
+
+  /* Tips Section */
+  .tips-section {
+    padding: 40px 0 64px;
+  }
+
+  .tips-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  .tip-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    transition: all 0.2s ease;
+  }
+
+  .tip-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+    border-color: var(--accent-light);
+  }
+
+  .tip-icon {
+    font-size: 28px;
+    margin-bottom: 14px;
+  }
+
+  .tip-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 6px;
+  }
+
+  .tip-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Footer */
+  footer {
+    background: var(--primary);
+    color: #cbd5e1;
+    padding: 40px 0 32px;
+  }
+
+  .footer-inner {
+    text-align: center;
+  }
+
+  .footer-logo {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 18px;
+    font-weight: 800;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .footer-tagline {
+    font-size: 13px;
+    color: #94a3b8;
+    margin-bottom: 20px;
+  }
+
+  .footer-divider {
+    width: 100%;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.1);
+    margin-bottom: 20px;
+  }
+
+  .footer-copy {
+    font-size: 12px;
+    color: #64748b;
+  }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .tips-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .hero h1 {
+      font-size: 30px;
+    }
+
+    .hero-sub {
+      font-size: 15px;
+    }
+
+    .hero {
+      padding: 40px 0 28px;
+    }
+
+    .section-header h2 {
+      font-size: 24px;
+    }
+
+    .tabs {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .tab-btn {
+      font-size: 13px;
+      padding: 14px 8px;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .tab-btn .tab-icon {
+      font-size: 18px;
+    }
+
+    .tab-btn .tab-text {
+      font-size: 12px;
+    }
+
+    .tab-content {
+      padding: 20px;
+    }
+
+    nav ul {
+      display: none;
+    }
+
+    nav ul.show {
+      display: flex;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      background: #fff;
+      padding: 12px;
+      border-bottom: 1px solid var(--border);
+      gap: 4px;
+    }
+
+    .mobile-menu-btn {
+      display: block;
+    }
+
+    .score-number {
+      font-size: 48px;
+    }
+
+    .result-card {
+      padding: 20px;
+    }
+
+    .tips-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="container">
+    <div class="header-inner">
+      <a href="#home" class="logo">
+        <span class="logo-icon">🛡️</span>
+        <div class="logo-group">
+          <span class="logo-text">PhishShield</span>
+          <span class="logo-tagline">Detect. Verify. Stay Safe.</span>
+        </div>
+      </a>
+      <button class="mobile-menu-btn" onclick="toggleMenu()">☰</button>
+      <nav>
+        <ul id="nav-menu">
+          <li><a href="#home" onclick="closeMenu()">Home</a></li>
+          <li><a href="#check" onclick="closeMenu()">Check Threat</a></li>
+          <li><a href="#tips" onclick="closeMenu()">Safety Tips</a></li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</header>
+
+<section id="home" class="hero">
+  <div class="container">
+    <div class="hero-badge">
+      🛡️ <span>Simple • Fast • Privacy Friendly</span>
+    </div>
+    <h1>Think Before You Click.</h1>
+    <p class="hero-sub">Check suspicious messages, URLs, and emails for common phishing indicators.</p>
+    <a href="#check" class="btn btn-primary">Check a Threat ↓</a>
+  </div>
+</section>
+
+<section id="check" class="section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Check for Phishing</h2>
+      <p>Select what you want to analyze.</p>
+    </div>
+
+    <div class="detection-card">
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('message', this)">
+          <span class="tab-icon">💬</span>
+          <span class="tab-text">Message</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('url', this)">
+          <span class="tab-icon">🔗</span>
+          <span class="tab-text">URL</span>
+        </button>
+        <button class="tab-btn" onclick="switchTab('email', this)">
+          <span class="tab-icon">📧</span>
+          <span class="tab-text">Email</span>
+        </button>
+      </div>
+
+      <div class="tab-content">
+        <!-- Message Tab -->
+        <div id="panel-message" class="tab-panel active">
+          <div class="privacy-note">🔒 Your input is analyzed locally in your browser.</div>
+          <div id="msg-validation" class="validation-msg">⚠️ Please paste a message to analyze first.</div>
+          <div class="form-group">
+            <label class="form-label" for="msg-input">Paste your message</label>
+            <textarea id="msg-input" class="form-textarea" placeholder="Example: Congratulations! You have won ₹50,000. Click here immediately to claim your reward: http://example.com"></textarea>
+          </div>
+          <div class="actions-row">
+            <button class="btn btn-primary" onclick="analyzeMessage()">Analyze Message</button>
+          </div>
+        </div>
+
+        <!-- URL Tab -->
+        <div id="panel-url" class="tab-panel">
+          <div class="privacy-note">🔒 Your input is analyzed locally in your browser.</div>
+          <div id="url-validation" class="validation-msg">⚠️ Please enter a URL to analyze first.</div>
+          <div class="form-group">
+            <label class="form-label" for="url-input">Enter website URL</label>
+            <input type="text" id="url-input" class="form-input" placeholder="https://example.com">
+          </div>
+          <div class="actions-row">
+            <button class="btn btn-primary" onclick="analyzeURL()">Analyze URL</button>
+          </div>
+        </div>
+
+        <!-- Email Tab -->
+        <div id="panel-email" class="tab-panel">
+          <div class="privacy-note">🔒 Your input is analyzed locally in your browser.</div>
+          <div id="email-validation" class="validation-msg">⚠️ Please fill in at least one field to analyze.</div>
+          <div class="form-group">
+            <label class="form-label" for="email-sender">Sender Email</label>
+            <input type="text" id="email-sender" class="form-input" placeholder="security@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email-subject">Subject</label>
+            <input type="text" id="email-subject" class="form-input" placeholder="Urgent: Your account will be suspended">
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="email-content">Email Content</label>
+            <textarea id="email-content" class="form-textarea" placeholder="Dear customer, your account has been suspended. Verify your account immediately by clicking this link..."></textarea>
+          </div>
+          <div class="actions-row">
+            <button class="btn btn-primary" onclick="analyzeEmail()">Analyze Email</button>
+          </div>
+        </div>
+
+        <!-- Result -->
+        <div id="result-card" class="result-card">
+          <div class="result-label">Analysis Result</div>
+          <div class="score-display">
+            <span id="score-number" class="score-number low">0</span>
+            <span class="score-divider">/ 100</span>
+          </div>
+          <div class="risk-badge">
+            <span id="risk-pill" class="risk-pill low">🟢 LOW RISK</span>
+          </div>
+          <div id="indicators-section"></div>
+          <div class="recommendations">
+            <div class="recommendations-title">What you should do:</div>
+            <ul id="recommendations-list">
+              <li>Always verify the source independently</li>
+              <li>When in doubt, do not click links or attachments</li>
+              <li>Contact the organization directly through official channels</li>
+            </ul>
+          </div>
+          <div class="disclaimer">
+            <strong>Important:</strong> PhishShield provides a basic educational risk assessment. A "Low Risk" result does not guarantee that a message, URL, or email is safe.
+          </div>
+          <button class="clear-btn" onclick="clearResult()">Clear</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tips" class="tips-section">
+  <div class="container">
+    <div class="section-header">
+      <h2>Stay Safe From Phishing</h2>
+      <p>Follow these simple rules to protect yourself online.</p>
+    </div>
+    <div class="tips-grid">
+      <div class="tip-card">
+        <div class="tip-icon">🔗</div>
+        <div class="tip-title">Don't click blindly</div>
+        <div class="tip-desc">Verify links before opening them. Hover over links to see the actual destination.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">🔐</div>
+        <div class="tip-title">Never share OTP</div>
+        <div class="tip-desc">Banks and legitimate services should not ask you to share OTPs or passwords.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">📧</div>
+        <div class="tip-title">Verify the sender</div>
+        <div class="tip-desc">Check the actual email address, not just the displayed name. Watch for misspellings.</div>
+      </div>
+      <div class="tip-card">
+        <div class="tip-icon">⏱️</div>
+        <div class="tip-title">Don't panic</div>
+        <div class="tip-desc">Phishing attacks often create urgency. Stop and verify first before taking any action.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-logo">🛡️ PhishShield</div>
+      <div class="footer-tagline">A simple educational phishing awareness tool.</div>
+      <div class="footer-divider"></div>
+      <div class="footer-copy">© 2026 PhishShield</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  function toggleMenu() {
+    document.getElementById('nav-menu').classList.toggle('show');
+  }
+
+  function closeMenu() {
+    document.getElementById('nav-menu').classList.remove('show');
+  }
+
+  let currentTab = 'message';
+
+  function switchTab(tab, btn) {
+    currentTab = tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+    document.getElementById('panel-' + tab).classList.add('active');
+    hideValidations();
+  }
+
+  function hideValidations() {
+    document.getElementById('msg-validation').classList.remove('show');
+    document.getElementById('url-validation').classList.remove('show');
+    document.getElementById('email-validation').classList.remove('show');
+  }
+
+  function calculateRiskScore(points) {
+    return Math.min(100, Math.max(0, points));
+  }
+
+  function getRiskLevel(score) {
+    if (score >= 60) return { level: 'high', label: '🔴 HIGH RISK' };
+    if (score >= 30) return { level: 'medium', label: '🟡 MEDIUM RISK' };
+    return { level: 'low', label: '🟢 LOW RISK' };
+  }
+
+  function displayResult(score, indicators, recommendations, type) {
+    const card = document.getElementById('result-card');
+    const scoreEl = document.getElementById('score-number');
+    const pillEl = document.getElementById('risk-pill');
+    const indicatorsSection = document.getElementById('indicators-section');
+    const recList = document.getElementById('recommendations-list');
+
+    const risk = getRiskLevel(score);
+
+    scoreEl.textContent = score;
+    scoreEl.className = 'score-number ' + risk.level;
+    pillEl.textContent = risk.label;
+    pillEl.className = 'risk-pill ' + risk.level;
+
+    if (indicators.length > 0) {
+      let html = '<div class="result-section-title">Potential phishing indicators detected</div>';
+      html += '<ul class="indicators-list">';
+      indicators.forEach(ind => {
+        const weakClass = ind.weak ? 'weak' : '';
+        html += `<li class="${weakClass}"><span class="indicator-icon">✓</span><span>${ind.text}</span></li>`;
+      });
+      html += '</ul>';
+      indicatorsSection.innerHTML = html;
+    } else {
+      indicatorsSection.innerHTML = '<div class="no-indicators">✓ No common phishing indicators detected. Still, use caution and verify independently.</div>';
+    }
+
+    recList.innerHTML = '';
+    recommendations.forEach(rec => {
+      const li = document.createElement('li');
+      li.textContent = rec;
+      recList.appendChild(li);
+    });
+
+    card.classList.add('show');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function clearResult() {
+    document.getElementById('result-card').classList.remove('show');
+    hideValidations();
+  }
+
+  function hasWords(text, words) {
+    const lower = text.toLowerCase();
+    return words.some(w => lower.includes(w));
+  }
+
+  function extractLinks(text) {
+    const urlRegex = /(https?:\/\/[^\s<>\"]+|www\.[^\s<>\"]+|[a-z0-9.-]+\.[a-z]{2,}[^\s<>\"]*)/gi;
+    const matches = text.match(urlRegex) || [];
+    return matches.length;
+  }
+
+  function analyzeMessage() {
+    const input = document.getElementById('msg-input').value.trim();
+    const validation = document.getElementById('msg-validation');
+    hideValidations();
+
+    if (!input) {
+      validation.classList.add('show');
+      return;
+    }
+
+    let score = 0;
+    const indicators = [];
+    const recommendations = [];
+
+    const urgentWords = ['urgent', 'immediately', 'act now', 'last chance', 'within 24 hours', 'right now', 'asap', 'hurry', 'instantly'];
+    const prizeWords = ['won', 'winner', 'reward', 'cash prize', 'lottery', 'congratulations', 'free money', 'prize', 'claim your', 'jackpot'];
+    const sensitiveWords = ['password', 'otp', 'pin', 'cvv', 'bank details', 'credit card', 'debit card', 'atm pin', 'verify password', 'login credentials'];
+    const threatWords = ['account blocked', 'account suspended', 'legal action', 'verify now', 'will be suspended', 'permanently locked', 'immediate action required', 'security breach', 'compromised'];
+    const paymentWords = ['payment', 'pay now', 'send money', 'transfer', 'bank transfer', 'gift card', 'itunes card', 'amazon pay', 'google pay', 'phone pay'];
+
+    if (hasWords(input, urgentWords)) {
+      score += 20;
+      indicators.push({ text: 'Urgent language detected - pressure to act quickly', weak: false });
+    }
+    if (hasWords(input, prizeWords)) {
+      score += 25;
+      indicators.push({ text: 'Reward or prize-related wording detected', weak: false });
+    }
+    if (hasWords(input, sensitiveWords)) {
+      score += 30;
+      indicators.push({ text: 'Request for sensitive information (OTP, password, CVV, etc.)', weak: false });
+    }
+    if (hasWords(input, threatWords)) {
+      score += 25;
+      indicators.push({ text: 'Threatening language or account suspension warning', weak: false });
+    }
+    if (hasWords(input, paymentWords)) {
+      score += 25;
+      indicators.push({ text: 'Request for payment or money transfer detected', weak: false });
+    }
+
+    const linkCount = extractLinks(input);
+    if (linkCount > 0) {
+      score += 15;
+      indicators.push({ text: 'Suspicious link(s) detected in the message', weak: false });
+    }
+
+    const exclamationCount = (input.match(/!/g) || []).length;
+    if (exclamationCount >= 3) {
+      score += 10;
+      indicators.push({ text: 'Excessive use of exclamation marks (!)', weak: true });
+    }
+
+    const uppercaseRatio = (input.match(/[A-Z]/g) || []).length / Math.max(1, input.length);
+    if (uppercaseRatio > 0.35) {
+      score += 8;
+      indicators.push({ text: 'Excessive use of ALL CAPS text', weak: true });
+    }
+
+    if (/\d+(?:,\d+)*(?:\.\d+)?\s*(?:rs|rupees|₹|₹|usd|\$|inr)/i.test(input) || /(?:rs|rupees|₹|₹|usd|\$|inr)\s*\d+/i.test(input)) {
+      score += 10;
+      indicators.push({ text: 'Mention of a specific monetary amount', weak: true });
+    }
+
+    score = calculateRiskScore(score);
+
+    const risk = getRiskLevel(score);
+    if (risk.level === 'high') {
+      recommendations.push('Do not click any links in this message');
+      recommendations.push('Do not reply or share any personal information');
+      recommendations.push('Delete this message immediately');
+      recommendations.push('Report this message to your service provider or authorities');
+    } else if (risk.level === 'medium') {
+      recommendations.push('Do not click any links without verifying the source');
+      recommendations.push('Do not share OTP, password, or any sensitive information');
+      recommendations.push('Verify the sender independently through official channels');
+    } else {
+      recommendations.push('Always verify the source independently');
+      recommendations.push('When in doubt, do not click links or attachments');
+      recommendations.push('Contact the organization directly through official channels');
+    }
+
+    displayResult(score, indicators, recommendations, 'message');
+  }
+
+  function analyzeURL() {
+    const input = document.getElementById('url-input').value.trim();
+    const validation = document.getElementById('url-validation');
+    hideValidations();
+
+    if (!input) {
+      validation.classList.add('show');
+      return;
+    }
+
+    let url = input.toLowerCase();
+    let score = 0;
+    const indicators = [];
+    const recommendations = [];
+
+    const hasProtocol = /^https?:\/\//i.test(input);
+    if (!hasProtocol) {
+      url = 'http://' + url;
+    }
+
+    try {
+      const parsed = new URL(url);
+      const hostname = parsed.hostname;
+      const path = parsed.pathname + parsed.search + parsed.hash;
+      const fullPath = hostname + path;
+
+      if (parsed.protocol === 'http:') {
+        score += 25;
+        indicators.push({ text: 'No HTTPS encryption - connection is not secure', weak: false });
+      }
+
+      const suspiciousKeywords = ['login', 'verify', 'secure', 'update', 'account', 'bank', 'payment', 'signin', 'sign-in', 'confirm', 'validate', 'authenticate', 'verification', 'security-check'];
+      const foundKeywords = suspiciousKeywords.filter(kw => fullPath.includes(kw));
+      if (foundKeywords.length > 0) {
+        score += Math.min(25, 12 + foundKeywords.length * 5);
+        indicators.push({ text: `Suspicious security-related keywords in URL (${foundKeywords.join(', ')})`, weak: false });
+      }
+
+      if (fullPath.length > 80) {
+        score += 15;
+        indicators.push({ text: 'Very long URL - often used to hide malicious destinations', weak: true });
+      }
+
+      const hyphenCount = (hostname.match(/-/g) || []).length;
+      if (hyphenCount >= 3) {
+        score += 12;
+        indicators.push({ text: 'Excessive hyphens in domain name', weak: true });
+      }
+
+      const subdomains = hostname.split('.').filter(p => p).length;
+      if (subdomains > 4) {
+        score += 12;
+        indicators.push({ text: 'Unusually large number of subdomains', weak: true });
+      }
+
+      if (/^\d+\.\d+\.\d+\.\d+$/.test(hostname) || /^\[?[0-9a-f:]+\]?$/i.test(hostname.replace(/\[|\]/g, '')) && hostname.includes(':')) {
+        score += 25;
+        indicators.push({ text: 'IP address used instead of a proper domain name', weak: false });
+      }
+
+      if (fullPath.includes('@')) {
+        score += 20;
+        indicators.push({ text: '"@" symbol in URL - can redirect to a different site', weak: false });
+      }
+
+      const specialChars = (fullPath.match(/[%#&?=_\-~+]/g) || []).length;
+      if (specialChars > 12) {
+        score += 10;
+        indicators.push({ text: 'Excessive special characters in URL', weak: true });
+      }
+
+      if (hostname.includes('xn--') || /%[0-9a-f]{2}/i.test(fullPath)) {
+        score += 20;
+        indicators.push({ text: 'Punycode or encoded characters detected - possible homograph attack', weak: false });
+      }
+
+      const shorteners = ['bit.ly', 'tinyurl.com', 't.co', 'goo.gl', 'ow.ly', 'is.gd', 'buff.ly', 'adf.ly', 'bc.vc', 'cutt.ly', 'rb.gy', 's.id', 'shorte.st', 'clk.im', 'linktr.ee'];
+      if (shorteners.some(s => hostname.includes(s) || hostname.endsWith(s.split('.').slice(-2).join('.')))) {
+        score += 18;
+        indicators.push({ text: 'URL shortener detected - hides the actual destination', weak: false });
+      }
+
+      const commonLegit = ['paypal.com', 'google.com', 'microsoft.com', 'apple.com', 'amazon.com', 'facebook.com', 'netflix.com', 'instagram.com', 'twitter.com', 'linkedin.com', 'whatsapp.com', 'gmail.com', 'yahoo.com', 'outlook.com'];
+      for (const legit of commonLegit) {
+        const main = legit.replace('.com', '');
+        if (hostname.includes(main) && !hostname.endsWith(legit) && !hostname.endsWith(legit.replace('.com', '.co.uk')) && !hostname.endsWith(legit.replace('.com', '.in'))) {
+          if (hostname !== main + '.com' && hostname !== 'www.' + legit) {
+            score += 18;
+            indicators.push({ text: `Brand name "${main}" appears in a non-official domain - possible typo squatting`, weak: false });
+            break;
+          }
+        }
+      }
+
+      const digitCount = (hostname.match(/\d/g) || []).length;
+      if (digitCount >= 4 && hostname.length > 10) {
+        score += 8;
+        indicators.push({ text: 'Many digits in the domain name', weak: true });
+      }
+
+    } catch (e) {
+      score += 30;
+      indicators.push({ text: 'Malformed or unrecognizable URL format', weak: false });
+    }
+
+    score = calculateRiskScore(score);
+
+    const risk = getRiskLevel(score);
+    if (risk.level === 'high') {
+      recommendations.push('Do NOT visit this website under any circumstances');
+      recommendations.push('If you already visited, do not enter any login or personal details');
+      recommendations.push('Run a malware scan on your device if you downloaded anything');
+      recommendations.push('Report this URL to your IT department or security team');
+    } else if (risk.level === 'medium') {
+      recommendations.push('Verify this link with the sender before opening');
+      recommendations.push('Do not enter passwords or personal information on unfamiliar sites');
+      recommendations.push('Check the site certificate and official domain spelling carefully');
+    } else {
+      recommendations.push('Always verify the source independently');
+      recommendations.push('When in doubt, do not click links or attachments');
+      recommendations.push('Contact the organization directly through official channels');
+    }
+
+    displayResult(score, indicators, recommendations, 'url');
+  }
+
+  function analyzeEmail() {
+    const sender = document.getElementById('email-sender').value.trim();
+    const subject = document.getElementById('email-subject').value.trim();
+    const content = document.getElementById('email-content').value.trim();
+    const validation = document.getElementById('email-validation');
+    hideValidations();
+
+    if (!sender && !subject && !content) {
+      validation.classList.add('show');
+      return;
+    }
+
+    let score = 0;
+    const indicators = [];
+    const recommendations = [];
+
+    if (sender) {
+      const freeDomains = ['@gmail.com', '@yahoo.com', '@hotmail.com', '@outlook.com', '@aol.com', '@icloud.com', '@protonmail.com', '@rediffmail.com', '@live.com'];
+      const hasFreeDomain = freeDomains.some(d => sender.toLowerCase().includes(d));
+      const looksOfficial = /bank|paypal|amazon|microsoft|google|apple|netflix|office|gov|support|help|itunes|facebook|account|security|service/i.test(sender);
+
+      if (hasFreeDomain && looksOfficial) {
+        score += 25;
+        indicators.push({ text: 'Official-looking organization using a free personal email domain', weak: false });
+      }
+
+      const emailMatch = sender.match(/<([^>]+)>/) || sender.match(/([a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,})/);
+      const emailPart = emailMatch ? emailMatch[1].toLowerCase() : sender.toLowerCase();
+
+      if (emailPart) {
+        const atIndex = emailPart.lastIndexOf('@');
+        if (atIndex !== -1) {
+          const domain = emailPart.substring(atIndex + 1);
+
+          const digitCount = (domain.match(/\d/g) || []).length;
+          if (digitCount >= 3) {
+            score += 12;
+            indicators.push({ text: 'Multiple digits in sender domain name', weak: true });
+          }
+
+          const hyphenCount = (domain.match(/-/g) || []).length;
+          if (hyphenCount >= 2) {
+            score += 8;
+            indicators.push({ text: 'Multiple hyphens in sender domain', weak: true });
+          }
+
+          const commonBrands = ['paypal', 'google', 'microsoft', 'apple', 'amazon', 'facebook', 'netflix', 'whatsapp', 'instagram', 'twitter', 'linkedin', 'sbi', 'hdfc', 'icici', 'axis', 'yesbank'];
+          const legitTLDs = ['.com', '.co.in', '.in', '.co.uk', '.org', '.net', '.gov', '.edu', '.ac.in'];
+
+          for (const brand of commonBrands) {
+            if (domain.includes(brand)) {
+              const looksLikeOfficial = legitTLDs.some(tld => domain === brand + tld || domain === 'www.' + brand + tld || domain.endsWith('.' + brand + tld));
+              if (!looksLikeOfficial) {
+                score += 22;
+                indicators.push({ text: `Brand "${brand}" in sender domain with non-standard TLD/structure`, weak: false });
+                break;
+              }
+            }
+          }
+
+          const specialCount = (domain.match(/[^a-z0-9.-]/gi) || []).length;
+          if (specialCount > 0) {
+            score += 10;
+            indicators.push({ text: 'Unusual characters in sender email domain', weak: true });
+          }
+
+          const parts = domain.split('.');
+          if (parts.length > 4) {
+            score += 8;
+            indicators.push({ text: 'Unusual number of subdomains in sender email', weak: true });
+          }
+        }
+      }
+
+      if (sender.length > 60) {
+        score += 6;
+        indicators.push({ text: 'Unusually long sender address', weak: true });
+      }
+    }
+
+    const combinedText = subject + ' ' + content;
+    if (subject || content) {
+      const urgentWords = ['urgent', 'immediately', 'act now', 'last chance', 'within 24 hours', 'right now', 'asap', 'hurry', 'instantly', 'immediate action', 'do not delay', 'time sensitive'];
+      const accountWords = ['account blocked', 'account suspended', 'legal action', 'verify now', 'will be suspended', 'permanently locked', 'security alert', 'compromised', 'security breach', 'unusual activity', 'suspicious login', 'has been locked'];
+      const prizeWords = ['won', 'winner', 'reward', 'cash prize', 'lottery', 'congratulations', 'free money', 'prize', 'claim your', 'jackpot', 'you have been selected'];
+      const sensitiveWords = ['password', 'otp', 'pin', 'cvv', 'bank details', 'credit card', 'debit card', 'atm pin', 'verify password', 'login credentials', 'social security', 'ssn', 'aadhaar'];
+      const paymentWords = ['payment', 'pay now', 'send money', 'transfer', 'bank transfer', 'gift card', 'itunes card', 'amazon pay', 'outstanding', 'invoice', 'overdue', 'unpaid'];
+
+      if (hasWords(combinedText, urgentWords)) {
+        score += 15;
+        indicators.push({ text: 'Urgent language creating pressure to act quickly', weak: false });
+      }
+      if (hasWords(combinedText, accountWords)) {
+        score += 22;
+        indicators.push({ text: 'Account threat or suspension warning detected', weak: false });
+      }
+      if (hasWords(combinedText, prizeWords)) {
+        score += 22;
+        indicators.push({ text: 'Reward or prize-related wording detected', weak: false });
+      }
+      if (hasWords(combinedText, sensitiveWords)) {
+        score += 28;
+        indicators.push({ text: 'Request for sensitive personal or financial information', weak: false });
+      }
+      if (hasWords(combinedText, paymentWords)) {
+        score += 22;
+        indicators.push({ text: 'Payment or money transfer request detected', weak: false });
+      }
+
+      const linkCount = extractLinks(combinedText);
+      if (linkCount > 0) {
+        score += Math.min(15, 8 + linkCount * 3);
+        indicators.push({ text: `${linkCount} link(s) detected in email - verify before clicking`, weak: false });
+      }
+
+      if (/dear (?:customer|user|friend|sir|madam|member|valued)/i.test(combinedText) || /dear\s+(?:customer|client)/i.test(combinedText)) {
+        score += 5;
+        indicators.push({ text: 'Generic greeting instead of personal name', weak: true });
+      }
+
+      const contentTotal = content || subject;
+      if (contentTotal) {
+        const exclamations = (contentTotal.match(/!/g) || []).length;
+        if (exclamations >= 4) {
+          score += 8;
+          indicators.push({ text: 'Excessive use of exclamation marks', weak: true });
+        }
+
+        const upperCount = (contentTotal.match(/[A-Z]/g) || []).length;
+        const textLength = contentTotal.replace(/[^a-zA-Z]/g, '').length;
+        if (textLength > 50 && (upperCount / textLength) > 0.3) {
+          score += 6;
+          indicators.push({ text: 'Excessive capitalization of text', weak: true });
+        }
+      }
+
+      const misspellings = /(?:recieve|seperate|occured|untill|alot|definately|accomodate|occurence|begining|beleive|calender|catagory|comming|completly|consistant|curiousity|definite|desparate|develope|dissapear|embarass|enviroment|everytime|existance|foriegn|goverment|grammer|harrass|immediatly|independant|knowlege|liason|libary|lisence|maintainance|medeival|millenium|minature|mischeivous|neccessary|neighbour|noticable|ocassion|occurance|paralell|persistant|pharoah|possesion|preceeding|priviledge|profesional|pronounciation|psycology|questionaire|rasberry|reccomend|relevent|reminice|resistence|rythm|secretery|sieze|sargent|succesful|suprise|tendancy|therefor|threshhold|tomarrow|truely|untill|usefull|vacume|wierd|wensday|withold|writting|writtten|your\s+welcome|your's|it's\s+own|could\s+of|would\s+of|should\s+of|their\s+is|alot|irregardless)/i;
+      if (content && misspellings.test(content)) {
+        score += 6;
+        indicators.push({ text: 'Potential spelling/grammar issues (weak indicator, common in scams)', weak: true });
+      }
+
+      if (/please\s+(?:kindly\s+)?(?:find|see|check)\s+(?:the\s+)?(?:attachment|attached)/i.test(combinedText) && linkCount === 0 && !content.includes('.pdf') && !content.includes('.doc')) {
+        score += 10;
+        indicators.push({ text: 'Mentions attachments - be cautious of unexpected files', weak: true });
+      }
+    }
+
+    score = calculateRiskScore(score);
+
+    const risk = getRiskLevel(score);
+    if (risk.level === 'high') {
+      recommendations.push('Do not reply to this email or click any links');
+      recommendations.push('Do not open any attachments from this sender');
+      recommendations.push('Do not share OTP, passwords, or any personal details');
+      recommendations.push('Report and delete this email');
+      recommendations.push('If you already interacted, contact your bank/service provider immediately');
+    } else if (risk.level === 'medium') {
+      recommendations.push('Do not click links without verifying the sender independently');
+      recommendations.push('Verify sender email address domain carefully');
+      recommendations.push('Never share OTP, passwords, or CVV over email');
+      recommendations.push('Contact the company directly via official phone/website');
+    } else {
+      recommendations.push('Always verify the source independently');
+      recommendations.push('When in doubt, do not click links or attachments');
+      recommendations.push('Contact the organization directly through official channels');
+    }
+
+    displayResult(score, indicators, recommendations, 'email');
+  }
+</script>
+
+</body>
+</html>
